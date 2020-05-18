@@ -1,0 +1,9 @@
+pop
+idem >= 6
+rend >= 4.2
+idem-aix; os_name == "AIX"
+idem-bsd; "BSD" in sys_platform
+idem-darwin; sys_platform == "darwin"
+idem-linux; sys_platform == "linux"
+idem-solaris; "sunos" in sys_platform
+idem-windows; sys_platform == 'win32'
