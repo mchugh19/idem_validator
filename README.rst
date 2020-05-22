@@ -31,7 +31,7 @@ Usage Example
                                  'status': 'Pass'},
      'test execution module ping': {'duration': 0.0, 'status': 'Pass'},
      'test skip ping': {'duration': 0.0, 'status': 'Skip'},
-     'test_args': {'duration': 0.0024, 'status': 'Pass'}}
+     'test_jinja': {'duration': 0.0024, 'status': 'Pass'}}
 
 
 tst Files
@@ -110,7 +110,7 @@ Jinja Example with assertion_section
 .. code-block:: yaml
 
     {% set expected_value = 5 %}
-    test_args:
+    test_jinja:
       module_and_function: cmd.run
       args:
         - echo
