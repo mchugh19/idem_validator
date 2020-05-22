@@ -8,10 +8,11 @@ written for `pop <https://gitlab.com/saltstack/pop/pop>`_ and
 `idem <https://gitlab.com/saltstack/pop/idem>`_.
 
 It is a test framework which enables running assertions on any
-`idem execution modules <https://idem.readthedocs.io/en/latest/>`_. Like other pop projects, as additional
-capabilties are added or idem is extended to additional execution modules, so is validator. Like saltcheck,
-this capabiltiy can be used to validate idem states successfully ran, or to validate deployments,
-permissions, or anything else for which there is an execution module.
+`idem execution modules <https://idem.readthedocs.io/en/latest/>`_. Like other
+`pop projects <https://pop.readthedocs.io>`_, as additional capabilties are added or idem is
+extended to additional execution modules, so is validator. Like saltcheck, this capabiltiy
+can be used to validate idem states successfully ran, or to validate deployments, permissions,
+or anything else for which there is an execution module.
 
 Usage Example
 =============
