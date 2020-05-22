@@ -1,4 +1,4 @@
-def traverse_dict_and_list(hub, data, key, default=None, delimiter=':'):
+def traverse_dict_and_list(hub, data, key, default=None, delimiter=":"):
     """
     Traverse a dict or list using a colon-delimited (or otherwise delimited,
     using the 'delimiter' param) target string. The target 'foo:bar:0' will
@@ -37,6 +37,7 @@ def traverse_dict_and_list(hub, data, key, default=None, delimiter=':'):
                 ptr = ptr[each]
             except KeyError:
                 import yaml
+
                 # YAML-load the current key (catches integer/float dict keys)
                 try:
                     loaded_key = yaml.safe_load(each)

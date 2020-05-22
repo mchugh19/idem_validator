@@ -1,4 +1,4 @@
-def check(hub, output, expected):
+def check(hub, output, expected, print_result):
     result = "Pass"
     try:
         assert output is False, "value is not False"

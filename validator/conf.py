@@ -1,10 +1,7 @@
 CLI_CONFIG = {
-    "tests": {
-        "positional": True,
-        "nargs": "+"
-    },
+    "tests": {"positional": True, "nargs": "+"},
     "render": {},
-    "delimiter": {}
+    "delimiter": {},
 }
 CONFIG = {
     "tests": {"default": [], "help": "The test to run when validator is called",},
@@ -12,10 +9,7 @@ CONFIG = {
         "default": "jinja|yaml",
         "help": "The render pipe to use, this allows for the language to be specified",
     },
-    "delimiter": {
-        "default": ":",
-        "help": "The default assertion section delimiter",
-    }
+    "delimiter": {"default": ":", "help": "The default assertion section delimiter",},
 }
 
 SUBCOMMANDS = {}

@@ -1,9 +1,8 @@
-
 # -*- coding: utf-8 -*-
 def get_ver():
-    '''
+    """
     Gather the version number from git
-    '''
+    """
     import subprocess
 
     proc = subprocess.Popen(["git", "describe"], stdout=subprocess.PIPE)
@@ -19,5 +18,6 @@ def get_ver():
         tag = base[: base.rindex("-")]
         ret = f"{tag}.post{count}+{csum}"
     return ret
+
 
 version = get_ver()
