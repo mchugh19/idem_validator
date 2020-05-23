@@ -1,6 +1,6 @@
 def check(hub, output, expected, print_result):
     result = "Pass"
-    if not expected:
+    if expected is None:
         return "Fail: Missing expected input"
     try:
         if print_result:

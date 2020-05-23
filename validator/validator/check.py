@@ -76,6 +76,9 @@ def _assert_block(hub, test_name, test_block) -> Dict:
     except AttributeError:
         hub.log.error(f"Invalid assertion {test_block['assertion']}")
         return f"Fail: Invalid assertion {test_block['assertion']}"
+    except KeyError:
+        hub.log.error(f"Test {test_name} missing assertion for {test_block}")
+        return f"Fail: Test {test_name} missing assertion for {test_block}"
     return assert_result
 
 
@@ -143,7 +146,7 @@ async def _execute(hub, test_block: Dict):
         hub.validator.RUNS[test_name].pop("execution_output", None)
 
 
-async def run_test(hub) -> Dict:
+async def run_test(hub) -> None:
     src = _get_tst_files(hub)
     blocks = hub.rend.init.blocks(f'{src["tsts"][0]}.tst')
     for bname, block in blocks.items():
