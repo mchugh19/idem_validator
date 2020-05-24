@@ -26,26 +26,6 @@ def _generate_result_summary(hub):
     )
 
 
-def _get_tst_files(hub) -> Dict:
-    """
-    Find specified file and path
-    """
-    tst_sources = []
-    tsts = []
-    for tst in hub.OPT["validator"]["tests"]:
-        if os.path.isfile(tst):
-            if tst.endswith(".tst"):
-                ref = tst[:-4]
-                tsts.append(ref)
-            tst_dir = os.path.dirname(tst)
-            implied = f"file://{tst_dir}"
-            if implied not in tst_sources:
-                tst_sources.append(implied)
-        else:
-            tsts.append(tst)
-    return {"tst_sources": tst_sources, "tsts": tsts}
-
-
 def _assert_block(hub, test_name, test_block) -> Dict:
     expected_return = test_block.get("expected_return", None)
     assertion_section = test_block.get("assertion_section", None)
@@ -146,16 +126,15 @@ async def execute(hub):
 async def main(hub) -> None:
     hub.validator.INQUE = asyncio.Queue()
     start = time.monotonic()
-    src = _get_tst_files(hub)
-    hub.log.debug(f"Passed tst files: {src}")
-    for tst in src["tsts"]:
-        blocks = hub.rend.init.blocks(f"{tst}.tst")
+    for tst in hub.OPT["validator"]["tests"]:
+        blocks = hub.rend.init.blocks(tst)
         for bname, block in blocks.items():
             tests = await hub.rend.init.parse_bytes(
                 block, hub.OPT["validator"]["render"]
             )
-            for test_name in tests:
-                hub.validator.INQUE.put_nowait({test_name: tests[test_name]})
+            if tests:
+                for test_name in tests:
+                    hub.validator.INQUE.put_nowait({test_name: tests[test_name]})
     workers = []
     for _ in range(int(hub.OPT["validator"]["workers"])):
         workers.append(asyncio.create_task(hub.validator.check.execute()))
@@ -168,6 +147,8 @@ async def main(hub) -> None:
     _generate_result_summary(hub)
     end = time.monotonic()
     hub.validator.RUNS["TEST RESULTS"]["Execution Time"] = round(end - start, 4)
-    print(getattr(hub.output, hub.OPT["validator"]["output"]).display(hub.validator.RUNS))
+    print(
+        getattr(hub.output, hub.OPT["validator"]["output"]).display(hub.validator.RUNS)
+    )
     if hub.validator.RUNS["TEST RESULTS"]["Failed"] > 0:
         sys.exit(1)

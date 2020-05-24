@@ -7,7 +7,7 @@ import shutil
 from setuptools import setup, Command
 
 NAME = "validator"
-DESC = ""
+DESC = "For any idem execution module, run a series of assertions to validate the output"
 
 # Version info -- read without importing
 _locals = {}
@@ -56,9 +56,9 @@ def discover_packages():
 
 setup(
     name=NAME,
-    author="",
-    author_email="",
-    url="",
+    author="Christian McHugh",
+    author_email="mchugh19@hotmail.com",
+    url="https://github.com/mchugh19/pop_validator",
     version=VERSION,
     install_requires=REQUIREMENTS,
     description=DESC,
