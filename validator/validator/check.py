@@ -4,6 +4,7 @@ import time
 import inspect
 import copy
 import sys
+import asyncio
 
 
 def _generate_result_summary(hub):
@@ -13,7 +14,6 @@ def _generate_result_summary(hub):
     passed = 0
     failed = 0
     skipped = 0
-    total_time = 0.0
     for key, value in hub.validator.RUNS.items():
         if value["status"].startswith("Pass"):
             passed = passed + 1
@@ -21,16 +21,8 @@ def _generate_result_summary(hub):
             failed = failed + 1
         if value["status"].startswith("Skip"):
             skipped = skipped + 1
-        total_time = total_time + float(value["duration"])
     hub.validator.RUNS.update(
-        {
-            "TEST RESULTS": {
-                "Execution Time": round(total_time, 4),
-                "Passed": passed,
-                "Failed": failed,
-                "Skipped": skipped,
-            }
-        }
+        {"TEST RESULTS": {"Passed": passed, "Failed": failed, "Skipped": skipped,}}
     )
 
 
@@ -107,53 +99,75 @@ def _run_assertions(hub, test_name: str, test_data: Dict):
         hub.validator.RUNS[test_name]["status"] = assert_result
 
 
-async def _execute(hub, test_block: Dict):
-    for test_name, test_content in test_block.items():
-        hub.validator.RUNS[test_name] = {}
-        skip = test_content.get("skip", False)
-        if skip:
-            hub.validator.RUNS[test_name]["duration"] = 0.0
-            hub.validator.RUNS[test_name]["status"] = "Skip"
-            return
-        start = time.time()
-        args = test_content.get("args", [])
-        kwargs = test_content.get("kwargs", {})
-        try:
-            if args:
-                test_result = getattr(hub.exec, test_content["module_and_function"])(
-                    args, **kwargs
+async def execute(hub):
+    while True:
+        test_block = await hub.validator.INQUE.get()
+        hub.log.debug(f"Worker running for {test_block}")
+        for test_name, test_content in test_block.items():
+            hub.validator.RUNS[test_name] = {}
+            skip = test_content.get("skip", False)
+            if skip:
+                hub.validator.RUNS[test_name]["duration"] = 0.0
+                hub.validator.RUNS[test_name]["status"] = "Skip"
+                hub.validator.INQUE.task_done()
+                break
+            start = time.monotonic()
+            args = test_content.get("args", [])
+            kwargs = test_content.get("kwargs", {})
+            try:
+                if args:
+                    test_result = getattr(
+                        hub.exec, test_content["module_and_function"]
+                    )(args, **kwargs)
+                else:
+                    test_result = getattr(
+                        hub.exec, test_content["module_and_function"]
+                    )(**kwargs)
+                if inspect.iscoroutine(test_result):
+                    test_result = await test_result
+                hub.validator.RUNS[test_name]["execution_output"] = test_result
+                # Run assertion against exec output
+                _run_assertions(hub, test_name, test_content)
+            except AttributeError:
+                hub.validator.RUNS[test_name][
+                    "status"
+                ] = f"Fail: Invalid module_and_function {test_content['module_and_function']}"
+                hub.log.error(
+                    f"Invalid module_and_function {test_content['module_and_function']}"
                 )
-            else:
-                test_result = getattr(hub.exec, test_content["module_and_function"])(
-                    **kwargs
-                )
-            if inspect.iscoroutine(test_result):
-                test_result = await test_result
-            hub.validator.RUNS[test_name]["execution_output"] = test_result
-            # Run assertion against exec output
-            _run_assertions(hub, test_name, test_content)
-        except AttributeError:
-            hub.validator.RUNS[test_name][
-                "status"
-            ] = f"Fail: Invalid module_and_function {test_content['module_and_function']}"
-            hub.log.error(
-                f"Invalid module_and_function {test_content['module_and_function']}"
-            )
 
-        end = time.time()
-        hub.validator.RUNS[test_name]["duration"] = round(end - start, 4)
-        # Delete execution results from hub data
-        hub.validator.RUNS[test_name].pop("execution_output", None)
+            end = time.monotonic()
+            hub.validator.RUNS[test_name]["duration"] = round(end - start, 4)
+            # Delete execution results from hub data
+            hub.validator.RUNS[test_name].pop("execution_output", None)
+            hub.validator.INQUE.task_done()
 
 
-async def run_test(hub) -> None:
+async def main(hub) -> None:
+    hub.validator.INQUE = asyncio.Queue()
+    start = time.monotonic()
     src = _get_tst_files(hub)
-    blocks = hub.rend.init.blocks(f'{src["tsts"][0]}.tst')
-    for bname, block in blocks.items():
-        tests = await hub.rend.init.parse_bytes(block, hub.OPT["validator"]["render"])
-        for test_name in tests:
-            await _execute(hub, {test_name: tests[test_name]})
+    hub.log.debug(f"Passed tst files: {src}")
+    for tst in src["tsts"]:
+        blocks = hub.rend.init.blocks(f"{tst}.tst")
+        for bname, block in blocks.items():
+            tests = await hub.rend.init.parse_bytes(
+                block, hub.OPT["validator"]["render"]
+            )
+            for test_name in tests:
+                hub.validator.INQUE.put_nowait({test_name: tests[test_name]})
+    workers = []
+    for _ in range(int(hub.OPT["validator"]["workers"])):
+        workers.append(asyncio.create_task(hub.validator.check.execute()))
+    await hub.validator.INQUE.join()
+
+    # Cleanup worker tasks
+    for task in workers:
+        task.cancel()
+
     _generate_result_summary(hub)
-    print(hub.output.pretty.display(hub.validator.RUNS))
+    end = time.monotonic()
+    hub.validator.RUNS["TEST RESULTS"]["Execution Time"] = round(end - start, 4)
+    print(getattr(hub.output, hub.OPT["validator"]["output"]).display(hub.validator.RUNS))
     if hub.validator.RUNS["TEST RESULTS"]["Failed"] > 0:
         sys.exit(1)

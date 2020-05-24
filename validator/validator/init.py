@@ -8,4 +8,4 @@ def __init__(hub):
 
 def cli(hub):
     hub.pop.config.load(["validator"], cli="validator")
-    hub.pop.loop.start(hub.validator.check.run_test())
+    hub.pop.loop.start(hub.validator.check.main())

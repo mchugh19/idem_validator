@@ -20,18 +20,52 @@ Usage Example
 .. code-block:: shell
 
     # validator examples.tst
-    {'TEST RESULTS': {'Execution Time': 0.0044,
-                      'Failed': 0,
-                      'Passed': 3,
-                      'Skipped': 1},
-     'multiple assertion test': {'assertion1': {'status': 'Pass'},
-                                 'assertion2': {'status': 'Pass'},
-                                 'assertion3': {'status': 'Pass'},
-                                 'duration': 0.0019,
-                                 'status': 'Pass'},
-     'test execution module ping': {'duration': 0.0, 'status': 'Pass'},
-     'test skip ping': {'duration': 0.0, 'status': 'Skip'},
-     'test_jinja': {'duration': 0.0024, 'status': 'Pass'}}
+    test execution module ping:
+        ----------
+        status:
+            Pass
+        duration:
+            0.0
+    test_args:
+        ----------
+        status:
+            Pass
+        duration:
+            0.004
+    multiple assertion test:
+        ----------
+        assertion1:
+            ----------
+            status:
+                Pass
+        assertion2:
+            ----------
+            status:
+                Pass
+        assertion3:
+            ----------
+            status:
+                Pass
+        status:
+            Pass
+        duration:
+            0.0025
+    test skip ping:
+        ----------
+        duration:
+            0.0
+        status:
+            Skip
+    TEST RESULTS:
+        ----------
+        Passed:
+            3
+        Failed:
+            0
+        Skipped:
+            1
+        Execution Time:
+            0.0105
 
 
 tst Files
