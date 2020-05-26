@@ -7,7 +7,7 @@ import sys
 import asyncio
 
 
-def _generate_result_summary(hub):
+def _generate_result_summary(hub) -> None:
     """
     generate and append test summary output
     """
@@ -26,12 +26,21 @@ def _generate_result_summary(hub):
     )
 
 
-def _assert_block(hub, test_name, test_block) -> Dict:
+def _assert_block(hub, test_name: str, test_block: Dict) -> Dict:
+    """
+    Runs actual assertion modules against test output
+    Expected to be called for a single assertion or a loop of assertions
+    """
     expected_return = test_block.get("expected_return", None)
     assertion_section = test_block.get("assertion_section", None)
     assertion_section_delimiter = test_block.get(
         "assertion_section_delimiter", hub.OPT["validator"]["delimiter"]
     )
+    if not assertion_section_delimiter:
+        hub.log.error(
+            f"Invalid assertion delimiter {test_block['assertion_section_delimiter']}"
+        )
+        return f"Fail: Invalid assertion delimiter {test_block['assertion_section_delimiter']}"
     assert_print_result = test_block.get("print_result", True)
     if assertion_section:
         test_output = hub.validator.utils.traverse_dict_and_list(
@@ -49,15 +58,16 @@ def _assert_block(hub, test_name, test_block) -> Dict:
         hub.log.error(f"Invalid assertion {test_block['assertion']}")
         return f"Fail: Invalid assertion {test_block['assertion']}"
     except KeyError:
-        hub.log.error(f"Test {test_name} missing assertion for {test_block}")
-        return f"Fail: Test {test_name} missing assertion for {test_block}"
+        hub.log.error(f'Test "{test_name}" missing assertion for {test_block}')
+        return f'Fail: Test "{test_name}" missing assertion for {test_block}'
     return assert_result
 
 
-def _run_assertions(hub, test_name: str, test_data: Dict):
+def _run_assertions(hub, test_name: str, test_data: Dict) -> None:
     """
-        Run assertion against input
-        """
+    Process the test data to call single assertion or loop over assertions
+    Set the assertion status as approperate
+    """
     if "assertions" in test_data:
         for num, assert_group in enumerate(test_data.get("assertions"), start=1):
             assert_result = _assert_block(hub, test_name, assert_group)
@@ -79,7 +89,10 @@ def _run_assertions(hub, test_name: str, test_data: Dict):
         hub.validator.RUNS[test_name]["status"] = assert_result
 
 
-async def execute(hub):
+async def execute(hub) -> None:
+    """
+    Worker called as a task to pop a message off the queue and process it
+    """
     while True:
         test_block = await hub.validator.INQUE.get()
         hub.log.debug(f"Worker running for {test_block}")
@@ -115,7 +128,20 @@ async def execute(hub):
                 hub.log.error(
                     f"Invalid module_and_function {test_content['module_and_function']}"
                 )
-
+            except (FileNotFoundError, SystemError):
+                hub.validator.RUNS[test_name][
+                    "status"
+                ] = f"Fail: Error running {test_content['module_and_function']} {args} {kwargs}"
+                hub.log.error(
+                    f"Fail: Error running {test_content['module_and_function']} {args} {kwargs}"
+                )
+            except:
+                hub.validator.RUNS[test_name][
+                    "status"
+                ] = f"Fail: Error running {test_name} {sys.exc_info()[0]}"
+                hub.log.error(
+                    f"Fail: Error running {test_name}"
+                )
             end = time.monotonic()
             hub.validator.RUNS[test_name]["duration"] = round(end - start, 4)
             # Delete execution results from hub data
@@ -124,6 +150,11 @@ async def execute(hub):
 
 
 async def main(hub) -> None:
+    """
+    Gather test files, process them through rend.
+    Put the results into a queue then call workers to run exec modules and assert on results
+    Output results through rend output, and exit 1 if failures detected
+    """
     hub.validator.INQUE = asyncio.Queue()
     start = time.monotonic()
     for tst in hub.OPT["validator"]["tests"]:
