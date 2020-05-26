@@ -7,3 +7,4 @@ idem-darwin; sys_platform == "darwin"
 idem-linux; sys_platform == "linux"
 idem-solaris; "sunos" in sys_platform
 idem-windows; sys_platform == 'win32'
+dict-toolbox

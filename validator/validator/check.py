@@ -6,6 +6,8 @@ import copy
 import sys
 import asyncio
 
+from dict_tools import data
+
 
 def _generate_result_summary(hub) -> None:
     """
@@ -43,7 +45,7 @@ def _assert_block(hub, test_name: str, test_block: Dict) -> Dict:
         return f"Fail: Invalid assertion delimiter {test_block['assertion_section_delimiter']}"
     assert_print_result = test_block.get("print_result", True)
     if assertion_section:
-        test_output = hub.validator.utils.traverse_dict_and_list(
+        test_output = data.traverse_dict_and_list(
             hub.validator.RUNS[test_name]["execution_output"],
             assertion_section,
             delimiter=assertion_section_delimiter,
@@ -139,9 +141,7 @@ async def execute(hub) -> None:
                 hub.validator.RUNS[test_name][
                     "status"
                 ] = f"Fail: Error running {test_name} {sys.exc_info()[0]}"
-                hub.log.error(
-                    f"Fail: Error running {test_name}"
-                )
+                hub.log.error(f"Fail: Error running {test_name}")
             end = time.monotonic()
             hub.validator.RUNS[test_name]["duration"] = round(end - start, 4)
             # Delete execution results from hub data

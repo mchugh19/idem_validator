@@ -58,7 +58,7 @@ setup(
     name=NAME,
     author="Christian McHugh",
     author_email="mchugh19@hotmail.com",
-    url="https://github.com/mchugh19/pop_validator",
+    url="https://github.com/mchugh19/idem_validator",
     version=VERSION,
     install_requires=REQUIREMENTS,
     description=DESC,
