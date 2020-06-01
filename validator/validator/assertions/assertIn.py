@@ -2,6 +2,8 @@ def check(hub, output, expected, print_result):
     result = "Pass"
     if expected is None:
         return "Fail: Missing expected input"
+    if output is None:
+        return "Fail: Module output is None"
     try:
         if print_result:
             assert expected in output, f"{expected} not found in {output}"
@@ -10,8 +12,5 @@ def check(hub, output, expected, print_result):
     except AssertionError as err:
         result = f"Fail: {err}"
     except TypeError as err:
-        if print_result:
-            result = f"Fail: {expected} not found in None"
-        else:
-            result = "Fail: Result not found"
+        result = "Fail: Result not found"
     return result

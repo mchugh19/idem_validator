@@ -1,3 +1,4 @@
+
 #!yaml
 test execution module ping:
   module_and_function: test.ping
@@ -8,8 +9,7 @@ test execution module ping:
 test_args:
   module_and_function: cmd.run
   args:
-    - echo
-    - 6
+    - echo 6
   kwargs:
     shell: True
   assertion_section: stdout
@@ -19,8 +19,7 @@ test_args:
 multiple assertion test:
   module_and_function: cmd.run
   args:
-    - echo
-    - something
+    - echo something
   assertions:
     - assertion: assertNotEmpty
     - assertion: assertEqual

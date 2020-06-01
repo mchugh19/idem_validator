@@ -113,7 +113,7 @@ async def execute(hub) -> None:
                 if args:
                     test_result = getattr(
                         hub.exec, test_content["module_and_function"]
-                    )(args, **kwargs)
+                    )(*args, **kwargs)
                 else:
                     test_result = getattr(
                         hub.exec, test_content["module_and_function"]

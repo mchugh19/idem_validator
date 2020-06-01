@@ -1,8 +1,12 @@
 def check(hub, output, expected, print_result):
     result = "Pass"
+    if expected is None:
+        return "Fail: Missing expected input"
+    if output is None:
+        return "Fail: Module output is None"
     try:
         if print_result:
-            assert expected not in output, f"{output} found"
+            assert expected not in output, f"{expected} found"
         else:
             assert expected not in output, "Result found"
     except AssertionError as err:
