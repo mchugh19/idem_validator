@@ -7,7 +7,9 @@ import shutil
 from setuptools import setup, Command
 
 NAME = "validator"
-DESC = "For any idem execution module, run a series of assertions to validate the output"
+DESC = (
+    "For any idem execution module, run a series of assertions to validate the output"
+)
 
 # Version info -- read without importing
 _locals = {}

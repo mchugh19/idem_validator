@@ -1,5 +1,6 @@
 import validator.validator.assertions.assertGreater as assertGreater
 
+
 def test_assertGreater_greater(mock_hub):
     expected = 5
     output = 4
@@ -40,6 +41,7 @@ def test_assertGreater_other_no_print(mock_hub):
     output = False
     result = assertGreater.check(mock_hub, output, expected, print_result)
     assert result == "Fail: Module output is a boolean"
+
 
 def test_assertGreater_other_print(mock_hub):
     expected = 5

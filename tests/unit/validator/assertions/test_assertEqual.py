@@ -1,5 +1,6 @@
 import validator.validator.assertions.assertEqual as assertEqual
 
+
 def test_assertEqual_is_equal(mock_hub):
     print_result = True
     output = "something"
@@ -29,6 +30,7 @@ def test_assertEqual_not_equal(mock_hub):
     result = assertEqual.check(mock_hub, output, expected, print_result)
     assert result == f"Fail: {expected} is not equal to {output}"
 
+
 def test_assertEqual_not_equal_no_print(mock_hub):
     output = "something"
     print_result = False
@@ -44,6 +46,7 @@ def test_assertEqual_not_equal_no_print(mock_hub):
     expected = ""
     result = assertEqual.check(mock_hub, output, expected, print_result)
     assert result == "Fail: Result is not equal"
+
 
 def test_assertEqual_empty_inputs(mock_hub):
     print_result = True

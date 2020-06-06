@@ -1,5 +1,6 @@
 import validator.validator.assertions.assertNotEqual as assertNotEqual
 
+
 def test_assertNotEqual_not_equal(mock_hub):
     print_result = True
     output = "something"
@@ -15,6 +16,7 @@ def test_assertNotEqual_not_equal(mock_hub):
     expected = ""
     result = assertNotEqual.check(mock_hub, output, expected, print_result)
     assert result == "Pass"
+
 
 def test_assertNotEqual_is_equal(mock_hub):
     output = "something"

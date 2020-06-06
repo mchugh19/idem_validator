@@ -1,5 +1,6 @@
 import validator.validator.assertions.assertNotIn as assertNotIn
 
+
 def test_assertNotIn_not_in(mock_hub):
     print_result = True
     output = "something"
@@ -16,6 +17,7 @@ def test_assertNotIn_not_in(mock_hub):
     result = assertNotIn.check(mock_hub, output, expected, print_result)
     assert result == "Pass"
 
+
 def test_assertNotIn_is_in(mock_hub):
     print_result = True
 
@@ -24,6 +26,7 @@ def test_assertNotIn_is_in(mock_hub):
     result = assertNotIn.check(mock_hub, output, expected, print_result)
     assert result == f"Fail: {expected} found"
 
+
 def test_assertNotIn_in_no_print(mock_hub):
     print_result = False
 
@@ -31,6 +34,7 @@ def test_assertNotIn_in_no_print(mock_hub):
     expected = "thing"
     result = assertNotIn.check(mock_hub, output, expected, print_result)
     assert result == "Fail: Result found"
+
 
 def test_assertNotIn_empty_inputs(mock_hub):
     print_result = True

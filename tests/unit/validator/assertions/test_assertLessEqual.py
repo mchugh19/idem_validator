@@ -1,5 +1,6 @@
 import validator.validator.assertions.assertLessEqual as assertLessEqual
 
+
 def test_assertLessEqual_greater(mock_hub):
     expected = 5
     print_result = False
@@ -42,6 +43,7 @@ def test_assertLessEqual_other_no_print(mock_hub):
     output = False
     result = assertLessEqual.check(mock_hub, output, expected, print_result)
     assert result == "Fail: Module output is a boolean"
+
 
 def test_assertLessEqual_other_print(mock_hub):
     expected = 7

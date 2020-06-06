@@ -1,5 +1,6 @@
 import validator.validator.assertions.assertTrue as assertTrue
 
+
 def test_assertTrue_true(mock_hub):
     expected = None
     print_result = True

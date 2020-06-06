@@ -17,7 +17,6 @@ CONFIG = {
         "default": "nested",
         "help": "Define which outputter system should be used to display the result",
     },
-
 }
 
 SUBCOMMANDS = {}
