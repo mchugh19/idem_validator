@@ -28,7 +28,7 @@ def _generate_result_summary(hub) -> None:
     )
 
 
-def _assert_block(hub, test_name: str, test_block: Dict) -> Dict:
+def _assert_block(hub, test_name: str, test_block: Dict) -> str:
     """
     Runs actual assertion modules against test output
     Expected to be called for a single assertion or a loop of assertions

@@ -1,4 +1,4 @@
-def check(hub, output, expected, print_result):
+def check(hub, output, expected, print_result: bool):
     result = "Pass"
     if expected is None:
         return "Fail: Missing expected input"

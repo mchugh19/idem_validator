@@ -1,4 +1,4 @@
-def check(hub, output, expected, print_result):
+def check(hub, output, expected, print_result: bool):
     result = "Pass"
     if output is None:
         return "Fail: Module output is None"

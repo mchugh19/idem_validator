@@ -1,4 +1,4 @@
-def check(hub, output, expected, print_result):
+def check(hub, output, expected, print_result: bool):
     result = "Pass"
     try:
         assert output, "value is empty"
